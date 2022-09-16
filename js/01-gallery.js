@@ -10,12 +10,15 @@ galleryContainer.insertAdjacentHTML('beforeend', itemsMarkup);
 
 galleryContainer.addEventListener('click', onItemClick);
 
+let modalWindow;
+
 function createGalleryMarkup(galleryItems) {
   return galleryItems
     .map(({ preview, original, description }) => {
       return `<div class="gallery__item">
   <a class="gallery__link" href="${original}">
     <img
+      loading = "lazy"
       class="gallery__image"
       src="${preview}"
       data-source="${original}"
@@ -28,7 +31,7 @@ function createGalleryMarkup(galleryItems) {
 }
 
 function onItemClick(e) {
-  stopDefAction(e);
+  e.preventDefault();
 
   if (e.target.nodeName !== 'IMG') {
     return;
@@ -39,12 +42,8 @@ function onItemClick(e) {
   closeModalWindow();
 }
 
-function stopDefAction(e) {
-  e.preventDefault();
-}
-
 function createModalWindow(e) {
-  const modalWindow = basicLightbox.create(
+  modalWindow = basicLightbox.create(
     `<img src='${e.target.dataset.source}' width = '800' height = '600'>`,
   );
   modalWindow.show();
@@ -53,7 +52,7 @@ function createModalWindow(e) {
 function closeModalWindow() {
   galleryContainer.addEventListener('keydown', e => {
     if (e.code === 'Escape') {
-      basicLightbox.close();
+      modalWindow.close();
     }
   });
 }
