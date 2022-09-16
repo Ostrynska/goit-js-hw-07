@@ -1,15 +1,16 @@
 import { galleryItems } from './gallery-items.js';
 // Change code below this line
-// console.log(galleryItems);
+console.log(galleryItems);
 
 const galleryContainer = document.querySelector('.gallery');
-const itemsMarkup = createGalleryItemsMarkup(galleryItems);
+
+const itemsMarkup = createGalleryMarkup(galleryItems);
 
 galleryContainer.insertAdjacentHTML('beforeend', itemsMarkup);
 
-galleryContainer.addEventListener('click', onGalleryContainerClick);
+galleryContainer.addEventListener('click', onItemClick);
 
-function createGalleryItemsMarkup(galleryItems) {
+function createGalleryMarkup(galleryItems) {
   return galleryItems
     .map(({ preview, original, description }) => {
       return `<div class="gallery__item">
@@ -17,7 +18,7 @@ function createGalleryItemsMarkup(galleryItems) {
     <img
       class="gallery__image"
       src="${preview}"
-      data-source="large-image.jpg"
+      data-source="${original}"
       alt="${description}"
     />
   </a>
@@ -26,17 +27,33 @@ function createGalleryItemsMarkup(galleryItems) {
     .join('');
 }
 
-function onGalleryContainerClick(e) {
-  const isGalleryItemLarge = e.target.classList.contains('gallery__link');
-  if (!isGalleryItemLarge) {
+function onItemClick(e) {
+  stopDefAction(e);
+
+  if (e.target.nodeName !== 'IMG') {
     return;
   }
-  //   e.stopPropagation();
-  //   e.preventDefault();
+
+  createModalWindow(e);
+
+  closeModalWindow();
 }
 
-// function stopRefToLink(e) {
-//   e.preventDefault();
-// }
+function stopDefAction(e) {
+  e.preventDefault();
+}
 
-// document.classList('.gallery__image').addEventListener('click', stopRefToLink);
+function createModalWindow(e) {
+  const modalWindow = basicLightbox.create(
+    `<img src='${e.target.dataset.source}' width = '800' height = '600'>`,
+  );
+  modalWindow.show();
+}
+
+function closeModalWindow() {
+  galleryContainer.addEventListener('keydown', e => {
+    if (e.code === 'Escape') {
+      basicLightbox.close();
+    }
+  });
+}
